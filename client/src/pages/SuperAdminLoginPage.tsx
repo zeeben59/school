@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, Navigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import axios from 'axios'
 import { API_BASE } from '../lib/config'
 import { useAuth } from '../context/AuthContext'
-import { ShieldCheck, Lock, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react'
+import { ShieldCheck, Lock, Loader2, AlertCircle } from 'lucide-react'
 import AuthLayout from '../components/auth/AuthLayout'
 import AuthInput from '../components/auth/AuthInput'
 import PasswordField from '../components/ui/PasswordField'
@@ -139,7 +139,6 @@ const SuperAdminLoginPage = () => {
             placeholder="Enter password"
             error={errors.password?.message}
             autocomplete="current-password"
-            name="password"
             {...register('password')}
           />
 

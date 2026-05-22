@@ -1,10 +1,11 @@
-import React, { forwardRef, InputHTMLAttributes } from 'react'
+import { forwardRef } from 'react'
+import type { ReactNode, InputHTMLAttributes } from 'react'
 import { cn } from '../../lib/utils'
 
 interface AuthInputProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string
   error?: string
-  icon?: React.ReactNode
+  icon?: ReactNode
   helperText?: string
 }
 

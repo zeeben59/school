@@ -3,7 +3,7 @@ import { API_BASE } from '../lib/config'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { ArrowRight, Loader2, AlertCircle, Sparkles, ShieldCheck, Mail, Phone, MapPin, User, School } from 'lucide-react'
+import { ArrowRight, Loader2, AlertCircle, Sparkles, Mail, Phone, MapPin, User, School } from 'lucide-react'
 import axios from 'axios'
 import { Link, useNavigate } from 'react-router-dom'
 import AuthLayout from '../components/auth/AuthLayout'
@@ -156,7 +156,6 @@ const RegisterPage = () => {
               placeholder="Create a strong password"
               error={errors.password?.message}
               autocomplete="new-password"
-              name="password"
               {...register('password', {
                 onChange: (event) => setPasswordValue(event.target.value),
               })}
@@ -166,7 +165,6 @@ const RegisterPage = () => {
               placeholder="Re-enter password"
               error={errors.confirmPassword?.message}
               autocomplete="new-password"
-              name="confirmPassword"
               {...register('confirmPassword')}
             />
           </div>

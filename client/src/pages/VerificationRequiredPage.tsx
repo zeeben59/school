@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { API_BASE } from '../lib/config'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import { AlertCircle, CheckCircle2, Loader2, Mail, ShieldCheck, RefreshCcw } from 'lucide-react'
 import AuthLayout from '../components/auth/AuthLayout'
@@ -11,7 +11,6 @@ const OTP_CONTEXT_KEY = 'registrationOtpContext'
 
 const VerificationRequiredPage = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [otpCode, setOtpCode] = useState('');

@@ -3,7 +3,7 @@ import { API_BASE } from '../lib/config'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { Mail, ArrowRight, Loader2, AlertCircle, ShieldCheck, CheckCircle2 } from 'lucide-react'
+import { Mail, Loader2, AlertCircle, ShieldCheck, CheckCircle2 } from 'lucide-react'
 import axios from 'axios'
 import { useNavigate, Link } from 'react-router-dom'
 import AuthLayout from '../components/auth/AuthLayout'
@@ -146,7 +146,6 @@ const LoginPage = () => {
             placeholder="Enter your password"
             error={errors.password?.message}
             autocomplete="current-password"
-            name="password"
             {...register('password')}
           />
 
