@@ -1,0 +1,13 @@
+OTP registration error: PrismaClientUnknownRequestError: 
+Invalid `prisma.pendingRegistration.create()` invocation:
+
+
+Error occurred during query execution:
+ConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(SqliteError { extended_code: 2570, message: Some("disk I/O error") }), transient: false })
+    at ei.handleRequestError (C:\Users\zeebe\OneDrive\Desktop\school management\server\node_modules\@prisma\client\runtime\library.js:121:7458)
+    at ei.handleAndLogRequestError (C:\Users\zeebe\OneDrive\Desktop\school management\server\node_modules\@prisma\client\runtime\library.js:121:6593)
+    at ei.request (C:\Users\zeebe\OneDrive\Desktop\school management\server\node_modules\@prisma\client\runtime\library.js:121:6300)
+    at async a (C:\Users\zeebe\OneDrive\Desktop\school management\server\node_modules\@prisma\client\runtime\library.js:130:9551)
+    at async Object.registerSchool (file:///C:/Users/zeebe/OneDrive/Desktop/school%20management/server/dist/controllers/auth-otp.js:201:9) {
+  clientVersion: '6.19.3'
+}

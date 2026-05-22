@@ -1,0 +1,40 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "prisma:generate": "prisma generate",
+    "dev": "tsx watch src/index.ts",
+    "dev:generate": "npm run prisma:generate && tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "create:superadmin": "tsx scratch/create-superadmin.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.29.0",
+    "@fastify/cors": "^11.2.0",
+    "@fastify/jwt": "^10.0.0",
+    "@fastify/multipart": "^10.0.0",
+    "@fastify/static": "^9.1.0",
+    "@prisma/client": "^6.19.3",
+    "axios": "^1.15.0",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.4.1",
+    "fastify": "^5.8.4",
+    "nodemailer": "^8.0.5",
+    "paystack-api": "^2.0.6",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/node": "^25.6.0",
+    "prisma": "^6.19.3",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2"
+  }
+}

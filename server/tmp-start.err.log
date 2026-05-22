@@ -1,0 +1,16 @@
+[startup] ❌ Fatal error during startup: PrismaClientKnownRequestError: 
+Invalid `prisma.school.upsert()` invocation:
+
+
+spawn EPERM
+    at bl.handleRequestError (C:\Users\zeebe\OneDrive\Desktop\school management\server\node_modules\@prisma\client\runtime\binary.js:258:7270)
+    at bl.handleAndLogRequestError (C:\Users\zeebe\OneDrive\Desktop\school management\server\node_modules\@prisma\client\runtime\binary.js:258:6594)
+    at bl.request (C:\Users\zeebe\OneDrive\Desktop\school management\server\node_modules\@prisma\client\runtime\binary.js:258:6301)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async o (C:\Users\zeebe\OneDrive\Desktop\school management\server\node_modules\@prisma\client\runtime\binary.js:267:9560)
+    at async ensureLocalPlatformAdmin (file:///C:/Users/zeebe/OneDrive/Desktop/school%20management/server/dist/utils/dev-admin.js:14:20)
+    at async start (file:///C:/Users/zeebe/OneDrive/Desktop/school%20management/server/dist/index.js:213:9) {
+  code: 'EPERM',
+  meta: { modelName: 'School' },
+  clientVersion: '6.19.3'
+}

@@ -1,0 +1,86 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-brand-50: #f0f9ff;
+  --color-brand-100: #e0f2fe;
+  --color-brand-200: #bae6fd;
+  --color-brand-300: #7dd3fc;
+  --color-brand-400: #38bdf8;
+  --color-brand-500: #0ea5e9;
+  --color-brand-600: #0284c7;
+  --color-brand-700: #0369a1;
+  --color-brand-800: #075985;
+  --color-brand-900: #0c4a6e;
+  --color-brand-950: #082f49;
+
+  --color-border: hsl(214.3 31.8% 91.4%);
+  --color-background: hsl(0 0% 100%);
+  --color-foreground: hsl(222.2 84% 4.9%);
+  
+  --radius-lg: 0.5rem;
+}
+
+:root.dark {
+  --color-border: hsl(217.2 32.6% 17.5%);
+  --color-background: hsl(222.2 84% 4.9%);
+  --color-foreground: hsl(210 40% 98%);
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground antialiased transition-colors duration-500 ease-in-out;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    @apply bg-white text-slate-900 placeholder:text-slate-500;
+  }
+
+  input:disabled,
+  input[readonly],
+  select:disabled,
+  textarea:disabled,
+  textarea[readonly] {
+    @apply bg-slate-100 text-slate-700 placeholder:text-slate-400 opacity-100;
+  }
+
+  select option {
+    color: #0f172a;
+    background-color: #ffffff;
+  }
+
+  input[type="file"] {
+    background-color: #ffffff;
+    color: #0f172a;
+  }
+}
+
+.glass {
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transition: background-color 0.5s ease;
+}
+
+.dark .glass {
+  background-color: rgba(15, 23, 42, 0.7);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.premium-gradient {
+  background: linear-gradient(to bottom right, var(--color-brand-600), var(--color-brand-500), var(--color-brand-400));
+}

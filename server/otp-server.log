@@ -1,0 +1,5 @@
+{"level":30,"time":1776240662979,"pid":9160,"hostname":"iamben","msg":"Server listening at http://127.0.0.1:5000"}
+🚀 Server listening on http://localhost:5000
+{"level":30,"time":1776240662981,"pid":9160,"hostname":"iamben","msg":"Server listening at http://192.168.1.75:5000"}
+{"level":30,"time":1776240666163,"pid":9160,"hostname":"iamben","reqId":"req-1","req":{"method":"POST","url":"/api/auth/register","host":"localhost:5000","remoteAddress":"127.0.0.1","remotePort":61617},"msg":"incoming request"}
+{"level":30,"time":1776240667662,"pid":9160,"hostname":"iamben","reqId":"req-1","res":{"statusCode":500},"responseTime":1497.0792000293732,"msg":"request completed"}

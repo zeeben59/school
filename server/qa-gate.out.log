@@ -1,0 +1,16 @@
+{"level":30,"time":1776416480074,"pid":3272,"hostname":"iamben","msg":"Server listening at http://127.0.0.1:5000"}
+Server listening on http://localhost:5000
+[mail] Initializing SMTP transport for smtp.gmail.com:587 as zeeben59@gmail.com
+{"level":30,"time":1776416480078,"pid":3272,"hostname":"iamben","msg":"Server listening at http://192.168.1.75:5000"}
+{"level":30,"time":1776416480797,"pid":3272,"hostname":"iamben","reqId":"req-1","req":{"method":"OPTIONS","url":"/api/notifications","host":"localhost:5000","remoteAddress":"127.0.0.1","remotePort":54657},"msg":"incoming request"}
+{"level":30,"time":1776416480829,"pid":3272,"hostname":"iamben","reqId":"req-1","res":{"statusCode":204},"responseTime":28.721700191497803,"msg":"request completed"}
+{"level":30,"time":1776416480830,"pid":3272,"hostname":"iamben","reqId":"req-2","req":{"method":"OPTIONS","url":"/api/notifications","host":"localhost:5000","remoteAddress":"127.0.0.1","remotePort":54658},"msg":"incoming request"}
+{"level":30,"time":1776416480831,"pid":3272,"hostname":"iamben","reqId":"req-2","res":{"statusCode":204},"responseTime":0.6967000961303711,"msg":"request completed"}
+{"level":30,"time":1776416480955,"pid":3272,"hostname":"iamben","reqId":"req-3","req":{"method":"GET","url":"/api/notifications","host":"localhost:5000","remoteAddress":"127.0.0.1","remotePort":54658},"msg":"incoming request"}
+{"level":30,"time":1776416481126,"pid":3272,"hostname":"iamben","reqId":"req-3","res":{"statusCode":200},"responseTime":170.0774998664856,"msg":"request completed"}
+{"level":30,"time":1776416481134,"pid":3272,"hostname":"iamben","reqId":"req-4","req":{"method":"GET","url":"/api/notifications","host":"localhost:5000","remoteAddress":"127.0.0.1","remotePort":54658},"msg":"incoming request"}
+{"level":30,"time":1776416481142,"pid":3272,"hostname":"iamben","reqId":"req-4","res":{"statusCode":200},"responseTime":7.46779990196228,"msg":"request completed"}
+[mail] SMTP connection verified successfully for zeeben59@gmail.com
+{"level":30,"time":1776416482251,"pid":3272,"hostname":"iamben","msg":"SMTP connection verified successfully at startup."}
+{"level":30,"time":1776416482878,"pid":3272,"hostname":"iamben","reqId":"req-5","req":{"method":"POST","url":"/api/auth/register","host":"localhost:5000","remoteAddress":"127.0.0.1","remotePort":54661},"msg":"incoming request"}
+{"level":30,"time":1776416484864,"pid":3272,"hostname":"iamben","reqId":"req-5","res":{"statusCode":503},"responseTime":1985.8805000782013,"msg":"request completed"}

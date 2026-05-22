@@ -1,0 +1,23 @@
+=binary : The term '=binary' is not recognized as the name of a cmdlet, function, script file, or operable program. 
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ ='binary'; node dist/index.js
++ ~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (=binary:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+ 
+[startup] ❌ Fatal error during startup: PrismaClientInitializationError: 
+Invalid `prisma.school.upsert()` invocation:
+
+
+Error opening a TLS connection: No credentials are available in the security package (os error -2146893042)
+    at ei.handleRequestError (C:\Users\zeebe\OneDrive\Desktop\school management\server\node_modules\@prisma\client\runtime\library.js:121:7568)
+    at ei.handleAndLogRequestError (C:\Users\zeebe\OneDrive\Desktop\school management\server\node_modules\@prisma\client\runtime\library.js:121:6593)
+    at ei.request (C:\Users\zeebe\OneDrive\Desktop\school management\server\node_modules\@prisma\client\runtime\library.js:121:6300)
+    at async a (C:\Users\zeebe\OneDrive\Desktop\school management\server\node_modules\@prisma\client\runtime\library.js:130:9551)
+    at async ensureLocalPlatformAdmin (file:///C:/Users/zeebe/OneDrive/Desktop/school%20management/server/dist/utils/dev-admin.js:14:20)
+    at async start (file:///C:/Users/zeebe/OneDrive/Desktop/school%20management/server/dist/index.js:211:9) {
+  clientVersion: '6.19.3',
+  errorCode: undefined,
+  retryable: undefined
+}

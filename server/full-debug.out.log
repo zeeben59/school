@@ -1,0 +1,10 @@
+{"level":30,"time":1776411003920,"pid":12820,"hostname":"iamben","msg":"Server listening at http://127.0.0.1:5000"}
+Server listening on http://localhost:5000
+[mail] Initializing SMTP transport for smtp.gmail.com:587 as zeeben59@gmail.com
+{"level":30,"time":1776411003922,"pid":12820,"hostname":"iamben","msg":"Server listening at http://192.168.1.75:5000"}
+[mail] SMTP connection verified successfully for zeeben59@gmail.com
+{"level":30,"time":1776411005696,"pid":12820,"hostname":"iamben","msg":"SMTP connection verified successfully at startup."}
+{"level":30,"time":1776411006574,"pid":12820,"hostname":"iamben","reqId":"req-1","req":{"method":"GET","url":"/api/health","host":"localhost:5000","remoteAddress":"127.0.0.1","remotePort":53193},"msg":"incoming request"}
+{"level":30,"time":1776411006588,"pid":12820,"hostname":"iamben","reqId":"req-1","res":{"statusCode":200},"responseTime":11.543600082397461,"msg":"request completed"}
+{"level":30,"time":1776411006899,"pid":12820,"hostname":"iamben","reqId":"req-2","req":{"method":"POST","url":"/api/auth/register","host":"localhost:5000","remoteAddress":"127.0.0.1","remotePort":53193},"msg":"incoming request"}
+{"level":30,"time":1776411008634,"pid":12820,"hostname":"iamben","reqId":"req-2","res":{"statusCode":500},"responseTime":1734.0155000686646,"msg":"request completed"}
