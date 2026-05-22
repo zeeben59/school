@@ -1,16 +1,13 @@
 import { useState } from 'react';
-import { API_BASE } from '../lib/config';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
 import { AlertCircle, CheckCircle2, Loader2, Lock } from 'lucide-react';
 import Navbar from '../components/landing/Navbar';
 import Footer from '../components/landing/Footer';
 import PasswordField from '../components/ui/PasswordField';
+import { supabase } from '../lib/supabase';
 
 const ResetPasswordPage = () => {
-  const [params] = useSearchParams();
   const navigate = useNavigate();
-  const token = params.get('token') || '';
 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -20,20 +17,23 @@ const ResetPasswordPage = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
     setLoading(true);
     setMessage(null);
     setError(null);
 
     try {
-      const response = await axios.post(`${API_BASE}/api/auth/reset-password`, {
-        token,
-        password,
-        confirmPassword,
-      });
-      setMessage(response.data.message || 'Password reset successfully.');
+      const { error: authError } = await supabase.auth.updateUser({ password });
+      if (authError) {
+        throw new Error(authError.message);
+      }
+      setMessage('Password reset successfully.');
       setTimeout(() => navigate('/login'), 1200);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Unable to reset password.');
+      setError(err.message || 'Unable to reset password.');
     } finally {
       setLoading(false);
     }
@@ -52,13 +52,6 @@ const ResetPasswordPage = () => {
             <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Reset Password</h1>
             <p className="text-slate-500 font-medium">Choose a new password for your account.</p>
           </div>
-
-          {!token && (
-            <div className="mb-4 p-4 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm font-medium flex items-center gap-3">
-              <AlertCircle size={18} />
-              Reset token is missing. Request a new password reset link.
-            </div>
-          )}
 
           {message && (
             <div className="mb-4 p-4 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 text-sm font-medium flex items-center gap-3">
@@ -90,7 +83,7 @@ const ResetPasswordPage = () => {
 
             <button
               type="submit"
-              disabled={loading || !token}
+              disabled={loading}
               className="w-full premium-gradient text-white py-4 px-8 rounded-2xl font-bold text-lg shadow-lg shadow-brand-500/25 flex items-center justify-center gap-2 disabled:opacity-70"
             >
               {loading ? <Loader2 className="animate-spin" size={20} /> : 'Update Password'}

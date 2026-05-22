@@ -25,11 +25,19 @@ export default function BackendHealthBanner() {
       const response = await fetch(`${API_BASE}/api/health`, {
         cache: 'no-store',
       })
+      const contentType = response.headers.get('content-type') || ''
+      const isJson = contentType.includes('application/json')
 
       if (!response.ok) {
-        const payload = await response.json().catch(() => null)
+        const payload = isJson ? await response.json().catch(() => null) : null
         setStatus('unhealthy')
         setMessage(payload?.error || `Health check failed (${response.status})`)
+        return
+      }
+
+      if (!isJson) {
+        setStatus('offline')
+        setMessage('Health endpoint returned non-JSON response')
         return
       }
 

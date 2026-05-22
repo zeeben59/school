@@ -3,14 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import axios from 'axios'
-import { API_BASE } from '../lib/config'
 import { useAuth } from '../context/AuthContext'
 import { ShieldCheck, Lock, Loader2, AlertCircle } from 'lucide-react'
 import AuthLayout from '../components/auth/AuthLayout'
 import AuthInput from '../components/auth/AuthInput'
 import PasswordField from '../components/ui/PasswordField'
 import { cn } from '../lib/utils'
+import { supabase } from '../lib/supabase'
 
 const adminLoginSchema = z.object({
   email: z.string().email('Enter a valid admin email'),
@@ -44,27 +43,35 @@ const SuperAdminLoginPage = () => {
     setError(null)
 
     try {
-      const response = await axios.post(`${API_BASE}/api/auth/login`, data)
-      const token = response.data?.token
-      const userData = response.data?.user
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: data.email.trim().toLowerCase(),
+        password: data.password,
+      })
 
-      if (!token || !userData) {
-        throw new Error('Unexpected server response. Please try again.')
+      if (authError || !authData.session || !authData.user) {
+        throw new Error(authError?.message || 'Unable to authenticate. Please check your credentials and try again.')
       }
 
+      const userData = {
+        id: authData.user.id,
+        email: authData.user.email || '',
+        firstName: (authData.user.user_metadata?.first_name as string | undefined) || 'Admin',
+        lastName: (authData.user.user_metadata?.last_name as string | undefined) || '',
+        role: (authData.user.user_metadata?.role as string | undefined) || 'DIRECTOR',
+        school: (authData.user.user_metadata?.school as string | undefined) || '',
+        schoolId: (authData.user.user_metadata?.schoolId as string | undefined) || '',
+        status: (authData.user.user_metadata?.status as string | undefined) || 'ACTIVE',
+        emailVerifiedAt: authData.user.email_confirmed_at,
+      }
       if (userData.role !== 'SUPERADMIN') {
         setError('This portal is for superadmin access only. Please login through the standard portal.')
         return
       }
 
-      login(token, userData)
+      login(authData.session.access_token, userData)
       navigate('/admin', { replace: true })
     } catch (err: any) {
-      if (err.response?.status === 403 && err.response?.data?.code === 'EMAIL_VERIFICATION_REQUIRED') {
-        navigate('/verify-email-required', { state: { email: err.response.data?.email } })
-        return
-      }
-      setError(err.response?.data?.error || 'Unable to authenticate. Please check your credentials and try again.')
+      setError(err?.message || 'Unable to authenticate. Please check your credentials and try again.')
     } finally {
       setIsLoading(false)
     }

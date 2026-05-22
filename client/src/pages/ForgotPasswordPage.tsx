@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { API_BASE } from '../lib/config';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import { AlertCircle, CheckCircle2, Loader2, Mail } from 'lucide-react';
 import Navbar from '../components/landing/Navbar';
 import Footer from '../components/landing/Footer';
+import { supabase } from '../lib/supabase';
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState('');
@@ -19,10 +18,15 @@ const ForgotPasswordPage = () => {
     setError(null);
 
     try {
-      const response = await axios.post(`${API_BASE}/api/auth/forgot-password`, { email });
-      setMessage(response.data.message || 'If an account with that email exists, a password reset link has been sent.');
+      const { error: authError } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (authError) {
+        throw new Error(authError.message);
+      }
+      setMessage('If an account with that email exists, a password reset link has been sent.');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Unable to start password reset.');
+      setError(err.message || 'Unable to start password reset.');
     } finally {
       setLoading(false);
     }

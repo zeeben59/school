@@ -1,10 +1,8 @@
 import { useState } from 'react'
-import { API_BASE } from '../lib/config'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { ArrowRight, Loader2, AlertCircle, Sparkles, Mail, Phone, MapPin, User, School } from 'lucide-react'
-import axios from 'axios'
 import { Link, useNavigate } from 'react-router-dom'
 import AuthLayout from '../components/auth/AuthLayout'
 import AuthCard from '../components/auth/AuthCard'
@@ -12,6 +10,7 @@ import AuthInput from '../components/auth/AuthInput'
 import PasswordField from '../components/ui/PasswordField'
 import PasswordStrength from '../components/auth/PasswordStrength'
 import AuthIllustration from '../components/auth/AuthIllustration'
+import { supabase } from '../lib/supabase'
 
 const registerSchema = z.object({
   schoolName: z.string().min(3, 'School name must be at least 3 characters'),
@@ -48,17 +47,38 @@ const RegisterPage = () => {
     setError(null)
 
     try {
-      const response = await axios.post(`${API_BASE}/api/auth/register`, data)
-      navigate('/verify-email-required', {
-        state: {
-          email: response.data.email || data.email,
-          expiresAt: response.data?.expiresAt || null,
+      const { error: authError } = await supabase.auth.signUp({
+        email: data.email.trim().toLowerCase(),
+        password: data.password,
+        options: {
+          data: {
+            full_name: data.directorFullName,
+            first_name: data.directorFullName.split(' ')[0] || 'User',
+            last_name: data.directorFullName.split(' ').slice(1).join(' '),
+            school: data.schoolName,
+            address: data.address,
+            phone: data.phone,
+            role: 'DIRECTOR',
+            status: 'ACTIVE',
+          },
         },
+      })
+
+      if (authError) {
+        throw new Error(authError.message)
+      }
+
+      navigate('/login', {
+        state: {
+          registered: true,
+          email: data.email,
+        },
+        replace: true,
       })
     } catch (err: any) {
       console.error('Registration request failed:', err)
       const fallback = 'Something went wrong. Please try again.'
-      const message = err.response?.data?.error || err.message || fallback
+      const message = err.message || fallback
       setError(message)
     } finally {
       setIsLoading(false)

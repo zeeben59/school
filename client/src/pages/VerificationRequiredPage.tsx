@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { API_BASE } from '../lib/config'
 import { Link, useLocation } from 'react-router-dom'
-import axios from 'axios'
 import { AlertCircle, CheckCircle2, Loader2, Mail, ShieldCheck, RefreshCcw } from 'lucide-react'
 import AuthLayout from '../components/auth/AuthLayout'
 import AuthCard from '../components/auth/AuthCard'
 import AuthIllustration from '../components/auth/AuthIllustration'
+import { supabase } from '../lib/supabase'
 
 const OTP_CONTEXT_KEY = 'registrationOtpContext'
 
@@ -68,46 +67,7 @@ const VerificationRequiredPage = () => {
   }, [expiresAt]);
 
   const handleVerify = async () => {
-    if (!email) {
-      setError('Missing account email. Please register or sign in again.');
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    setMessage(null);
-
-    try {
-      const response = await axios.post(`${API_BASE}/api/auth/verify-registration-otp`, {
-        email: email.trim().toLowerCase(),
-        otpCode: otpCode.trim()
-      });
-
-      setMessage(response.data.message || 'OTP verified successfully.');
-      sessionStorage.removeItem(OTP_CONTEXT_KEY);
-
-      if (response.data.authorization_url) {
-        window.location.href = response.data.authorization_url;
-      }
-    } catch (err: any) {
-      if (err.response) {
-        const status = err.response.status;
-        const backendError = err.response?.data?.error;
-        if (status === 400 || status === 404 || status === 409) {
-          setError(backendError || 'OTP verification failed. Please check code and email.');
-        } else if (status === 429) {
-          setError(backendError || 'Too many attempts. Please wait and try again.');
-        } else if (status >= 500) {
-          setError(backendError || 'Server error while verifying OTP. Please try again.');
-        } else {
-          setError(backendError || 'Unable to verify OTP.');
-        }
-      } else {
-        setError('Network error. Unable to reach verification server.');
-      }
-    } finally {
-      setLoading(false);
-    }
+    setMessage('Use the verification link sent to your email inbox, then return and sign in.');
   };
 
   const handleResend = async () => {
@@ -125,12 +85,16 @@ const VerificationRequiredPage = () => {
     setMessage(null);
 
     try {
-      const response = await axios.post(`${API_BASE}/api/auth/resend-registration-otp`, {
-        email: email.trim().toLowerCase()
-      });
-      setMessage(response.data.message || 'A new OTP has been sent.');
+      const { error: authError } = await supabase.auth.resend({
+        type: 'signup',
+        email: email.trim().toLowerCase(),
+      })
+      if (authError) {
+        throw new Error(authError.message)
+      }
+      setMessage('A new verification email has been sent.');
       setOtpCode('');
-      const nextExpiry = response.data?.expiresAt ? new Date(response.data.expiresAt).getTime() : null;
+      const nextExpiry = Date.now() + 15 * 60_000;
       setExpiresAt(nextExpiry);
       setResendCooldownUntil(Date.now() + 30_000);
       sessionStorage.setItem(OTP_CONTEXT_KEY, JSON.stringify({
@@ -138,12 +102,7 @@ const VerificationRequiredPage = () => {
         expiresAt: nextExpiry,
       }));
     } catch (err: any) {
-      const status = err.response?.status;
-      if (status === 429) {
-        setError(err.response?.data?.error || 'Too many resend attempts. Please wait and try again.');
-      } else {
-        setError(err.response?.data?.error || 'Unable to resend OTP.');
-      }
+      setError(err.message || 'Unable to resend verification email.');
     } finally {
       setLoading(false);
     }
@@ -152,7 +111,7 @@ const VerificationRequiredPage = () => {
   return (
     <AuthLayout
       title="Verify your email"
-      subtitle="Enter the OTP sent to your school email address to continue registration and complete billing setup."
+      subtitle="Verify your email address to complete sign-up and unlock secure access."
       accentText="Secure onboarding"
       panel={(
         <div className="relative z-10 flex h-full flex-col justify-between gap-8">
@@ -177,7 +136,7 @@ const VerificationRequiredPage = () => {
         </div>
       )}
     >
-      <AuthCard title="Email OTP verification" description="Paste the 6-digit code from your inbox to continue.">
+      <AuthCard title="Email verification required" description="Use the email verification link from your inbox to continue.">
         <div className="space-y-5">
           <div className="space-y-3">
             <p className="text-sm font-semibold text-slate-600">Verification email</p>
@@ -201,13 +160,13 @@ const VerificationRequiredPage = () => {
           )}
 
           <div className="rounded-3xl border border-slate-200 bg-white p-4">
-            <label className="mb-2 block text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">One-time password</label>
+            <label className="mb-2 block text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">Verification code (legacy)</label>
             <input
               value={otpCode}
               onChange={(event) => setOtpCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
               maxLength={6}
               inputMode="numeric"
-              placeholder="Enter 6-digit code"
+              placeholder="Verification now uses email link"
               className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-4 text-center text-2xl font-black tracking-[0.35em] text-slate-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15"
             />
             <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-xs font-medium text-slate-500">
@@ -224,10 +183,10 @@ const VerificationRequiredPage = () => {
           <div className="grid gap-3">
             <button
               onClick={handleVerify}
-              disabled={loading || otpCode.length !== 6}
+              disabled={loading}
               className="flex w-full items-center justify-center gap-2 rounded-3xl bg-slate-950 px-5 py-4 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {loading ? <Loader2 className="animate-spin" size={18} /> : 'Verify OTP & continue'}
+              {loading ? <Loader2 className="animate-spin" size={18} /> : 'I have verified my email'}
             </button>
 
             <button
@@ -247,7 +206,7 @@ const VerificationRequiredPage = () => {
           </div>
 
           <p className="text-center text-sm text-slate-500">
-            After verification, you&apos;ll be redirected to Paystack to complete enrollment.
+            After verifying your email from the inbox link, return to login and sign in.
           </p>
         </div>
       </AuthCard>

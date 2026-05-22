@@ -1,40 +1,31 @@
 import { useEffect, useState } from 'react';
-import { API_BASE } from '../lib/config';
-import { Link, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
+import { Link } from 'react-router-dom';
 import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import Navbar from '../components/landing/Navbar';
 import Footer from '../components/landing/Footer';
+import { supabase } from '../lib/supabase';
 
 const VerifyEmailPage = () => {
-  const [params] = useSearchParams();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('Verifying your email...');
 
   useEffect(() => {
-    const token = params.get('token');
-
-    if (!token) {
-      setStatus('error');
-      setMessage('Verification links are no longer used. Please verify your email with OTP from the registration flow.');
-      return;
-    }
-
-    axios
-      .get(`${API_BASE}/api/auth/verify-email?token=${encodeURIComponent(token)}`)
-      .then((response) => {
-        setStatus('success');
-        setMessage(response.data.message || 'Email verified successfully.');
-      })
-      .catch((err) => {
+    supabase.auth.getUser().then(({ data, error }) => {
+      if (error || !data.user) {
         setStatus('error');
-        if (err.response?.status === 410) {
-          setMessage('Email link verification has been replaced with OTP verification. Continue via the verification page to request or enter OTP.');
-          return;
-        }
-        setMessage(err.response?.data?.error || 'Failed to verify email.');
-      });
-  }, [params]);
+        setMessage('Unable to verify your session. Please request another verification email.');
+        return;
+      }
+
+      if (data.user.email_confirmed_at) {
+        setStatus('success');
+        setMessage('Email verified successfully.');
+      } else {
+        setStatus('error');
+        setMessage('Email is not verified yet. Please check your inbox for the verification link.');
+      }
+    });
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
