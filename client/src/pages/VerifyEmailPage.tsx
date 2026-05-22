@@ -10,7 +10,9 @@ const VerifyEmailPage = () => {
   const [message, setMessage] = useState('Verifying your email...');
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data, error }) => {
+    const verifyEmail = async () => {
+      const { data, error } = await supabase.auth.getUser();
+
       if (error || !data.user) {
         setStatus('error');
         setMessage('Unable to verify your session. Please request another verification email.');
@@ -24,7 +26,9 @@ const VerifyEmailPage = () => {
         setStatus('error');
         setMessage('Email is not verified yet. Please check your inbox for the verification link.');
       }
-    });
+    };
+
+    void verifyEmail();
   }, []);
 
   return (
