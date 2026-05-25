@@ -17,7 +17,6 @@ import {
 } from '../utils/subscription.js'
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '8h'
 
 function requirePaystackSecretKey() {
   if (!PAYSTACK_SECRET_KEY) {
@@ -46,7 +45,7 @@ type PaystackMetadata = {
   termName?: string
 }
 
-async function buildDirectorAuthPayload(request: FastifyRequest, schoolId: string) {
+async function buildDirectorAuthPayload(schoolId: string) {
   const subscriptionState = await ensureSchoolSubscriptionState(schoolId)
 
   const director: any = await prisma.user.findFirst({
@@ -57,13 +56,6 @@ async function buildDirectorAuthPayload(request: FastifyRequest, schoolId: strin
   if (!director) {
     return { token: null, user: null }
   }
-
-  const token = request.server.jwt.sign({
-    id: director.id,
-    email: director.email,
-    role: director.role,
-    schoolId: director.schoolId
-  }, { expiresIn: JWT_EXPIRES_IN })
 
   const hasActiveSubscription = Boolean(subscriptionState?.activeSubscription)
   const hasActiveTrial = Boolean(subscriptionState?.trial?.isActive)
@@ -92,7 +84,7 @@ async function buildDirectorAuthPayload(request: FastifyRequest, schoolId: strin
     accessState,
   }
 
-  return { token, user }
+  return { token: null, user }
 }
 
 export const initializePaystackPayment = async (
@@ -262,7 +254,7 @@ export const verifyPayment = async (request: FastifyRequest, reply: FastifyReply
       await ensureSchoolSubscriptionState(paymentRecord.schoolId)
       emitAdminSubscriptionsUpdated('subscription:verified')
 
-      const { token, user } = await buildDirectorAuthPayload(request, paymentRecord.schoolId)
+      const { token, user } = await buildDirectorAuthPayload(paymentRecord.schoolId)
       return reply.status(200).send({
         message: paymentType === 'REGISTRATION'
           ? 'Registration payment already verified.'
@@ -287,7 +279,7 @@ export const verifyPayment = async (request: FastifyRequest, reply: FastifyReply
       await applyPaymentSuccessEffects(paymentRecord, paymentTermName)
       await ensureSchoolSubscriptionState(paymentRecord.schoolId)
       emitAdminSubscriptionsUpdated('subscription:verified')
-      const { token, user } = await buildDirectorAuthPayload(request, paymentRecord.schoolId)
+      const { token, user } = await buildDirectorAuthPayload(paymentRecord.schoolId)
       return reply.status(200).send({
         message: paymentType === 'REGISTRATION'
           ? 'Registration payment already verified.'
@@ -302,7 +294,7 @@ export const verifyPayment = async (request: FastifyRequest, reply: FastifyReply
     await applyPaymentSuccessEffects(paymentRecord, paymentTermName)
     await ensureSchoolSubscriptionState(paymentRecord.schoolId)
     emitAdminSubscriptionsUpdated('subscription:verified')
-    const { token, user } = await buildDirectorAuthPayload(request, paymentRecord.schoolId)
+    const { token, user } = await buildDirectorAuthPayload(paymentRecord.schoolId)
 
     return reply.status(200).send({
       message: paymentType === 'REGISTRATION'

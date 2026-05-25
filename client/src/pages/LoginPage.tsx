@@ -10,7 +10,7 @@ import AuthInput from '../components/auth/AuthInput'
 import PasswordField from '../components/ui/PasswordField'
 import AuthIllustration from '../components/auth/AuthIllustration'
 import { useAuth } from '../context/AuthContext'
-import { supabase } from '../lib/supabase'
+import { API_BASE } from '../lib/config'
 
 const loginSchema = z.object({
   email: z.string().email('Enter a valid email address'),
@@ -40,29 +40,21 @@ const LoginPage = () => {
     setError(null)
 
     try {
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: data.email.trim().toLowerCase(),
-        password: data.password,
+      const response = await fetch(`${API_BASE}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: data.email.trim().toLowerCase(),
+          password: data.password,
+        }),
       })
-
-      if (authError || !authData.session || !authData.user) {
-        throw new Error(authError?.message || 'Invalid email or password')
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok || !payload?.token || !payload?.user) {
+        throw new Error(payload?.error || 'Invalid email or password')
       }
 
-      const fullName = (authData.user.user_metadata?.full_name as string | undefined)?.trim() || ''
-      const [firstName = 'User', ...lastParts] = fullName.split(/\s+/).filter(Boolean)
-      const user = {
-        id: authData.user.id,
-        email: authData.user.email || '',
-        firstName: (authData.user.user_metadata?.first_name as string | undefined) || firstName,
-        lastName: (authData.user.user_metadata?.last_name as string | undefined) || lastParts.join(' '),
-        role: (authData.user.user_metadata?.role as string | undefined) || 'DIRECTOR',
-        school: (authData.user.user_metadata?.school as string | undefined) || '',
-        schoolId: (authData.user.user_metadata?.schoolId as string | undefined) || '',
-        status: (authData.user.user_metadata?.status as string | undefined) || 'ACTIVE',
-        emailVerifiedAt: authData.user.email_confirmed_at,
-      }
-      const token = authData.session.access_token
+      const token = payload.token
+      const user = payload.user
       login(token, user, rememberMe)
 
       switch (user.role) {

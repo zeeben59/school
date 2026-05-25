@@ -9,7 +9,7 @@ import AuthLayout from '../components/auth/AuthLayout'
 import AuthInput from '../components/auth/AuthInput'
 import PasswordField from '../components/ui/PasswordField'
 import { cn } from '../lib/utils'
-import { supabase } from '../lib/supabase'
+import { API_BASE } from '../lib/config'
 
 const adminLoginSchema = z.object({
   email: z.string().email('Enter a valid admin email'),
@@ -43,32 +43,26 @@ const SuperAdminLoginPage = () => {
     setError(null)
 
     try {
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: data.email.trim().toLowerCase(),
-        password: data.password,
+      const response = await fetch(`${API_BASE}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: data.email.trim().toLowerCase(),
+          password: data.password,
+        }),
       })
-
-      if (authError || !authData.session || !authData.user) {
-        throw new Error(authError?.message || 'Unable to authenticate. Please check your credentials and try again.')
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok || !payload?.token || !payload?.user) {
+        throw new Error(payload?.error || 'Unable to authenticate. Please check your credentials and try again.')
       }
 
-      const userData = {
-        id: authData.user.id,
-        email: authData.user.email || '',
-        firstName: (authData.user.user_metadata?.first_name as string | undefined) || 'Admin',
-        lastName: (authData.user.user_metadata?.last_name as string | undefined) || '',
-        role: (authData.user.user_metadata?.role as string | undefined) || 'DIRECTOR',
-        school: (authData.user.user_metadata?.school as string | undefined) || '',
-        schoolId: (authData.user.user_metadata?.schoolId as string | undefined) || '',
-        status: (authData.user.user_metadata?.status as string | undefined) || 'ACTIVE',
-        emailVerifiedAt: authData.user.email_confirmed_at,
-      }
+      const userData = payload.user
       if (userData.role !== 'SUPERADMIN') {
         setError('This portal is for superadmin access only. Please login through the standard portal.')
         return
       }
 
-      login(authData.session.access_token, userData)
+      login(payload.token, userData)
       navigate('/admin', { replace: true })
     } catch (err: any) {
       setError(err?.message || 'Unable to authenticate. Please check your credentials and try again.')

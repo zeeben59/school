@@ -13,7 +13,6 @@ import {
 import axios from 'axios';
 import Navbar from '../components/landing/Navbar';
 import Footer from '../components/landing/Footer';
-import { useAuth } from '../context/AuthContext';
 
 function getAxiosErrorMessage(error: unknown, fallback: string) {
   if (axios.isAxiosError<{ error?: string }>(error)) {
@@ -25,7 +24,6 @@ function getAxiosErrorMessage(error: unknown, fallback: string) {
 const VerifyPayment = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { login } = useAuth();
   const reference = searchParams.get('reference');
   
   const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
@@ -44,10 +42,6 @@ const VerifyPayment = () => {
         const response = await axios.get(`${API_BASE}/api/payments/verify/${reference}`);
         
         if (response.status === 200) {
-          // Auto-login: store token and user data from verification response
-          if (response.data.token) {
-            login(response.data.token, response.data.user);
-          }
           if (response.data.paymentType === 'REGISTRATION' || response.data.paymentType === 'SUBSCRIPTION') {
             setPaymentType(response.data.paymentType);
           }
@@ -65,7 +59,7 @@ const VerifyPayment = () => {
 
     const timer = setTimeout(verify, 1500); // Small delay for UX feel
     return () => clearTimeout(timer);
-  }, [reference, login]);
+  }, [reference]);
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -110,10 +104,10 @@ const VerifyPayment = () => {
                   : 'Your school term plan has been activated successfully. You can now access the management dashboard.'}
               </p>
               <button
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate('/login')}
                 className="w-full premium-gradient text-white py-4 px-8 rounded-2xl font-bold text-lg shadow-lg shadow-brand-500/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
-                Go to Dashboard
+                Continue to Login
                 <ArrowRight size={20} />
               </button>
             </div>

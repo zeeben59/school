@@ -9,6 +9,7 @@ export const tenantMiddleware = async (request: FastifyRequest, reply: FastifyRe
   }
 
   let authenticatedSchoolId: string | null = null
+  let resolvedAuthUser: { id: string; role: string; schoolId: string | null } | null = null
 
   // Tenant authority — try Fastify JWT first, fallback to Supabase token if present.
   try {
@@ -16,7 +17,12 @@ export const tenantMiddleware = async (request: FastifyRequest, reply: FastifyRe
       try {
         const decoded = await request.jwtVerify<{ id: string; schoolId: string; role: string }>()
         if (decoded) {
-          ;(request as any).user = decoded
+          resolvedAuthUser = {
+            id: decoded.id,
+            role: decoded.role,
+            schoolId: decoded.schoolId ?? null,
+          }
+          ;(request as any).user = resolvedAuthUser
           authenticatedSchoolId = decoded.schoolId
         }
       } catch {
@@ -29,12 +35,13 @@ export const tenantMiddleware = async (request: FastifyRequest, reply: FastifyRe
             const user = data.user
             // attempt to load profile for role/school context
             const { data: profile } = await supabaseAdmin.from('profiles').select('*').eq('id', user.id).maybeSingle()
-            ;(request as any).user = {
+            resolvedAuthUser = {
               id: user.id,
               role: profile?.role || user.user_metadata?.role || 'USER',
               schoolId:
                 profile?.school_id || profile?.schoolId || user.user_metadata?.school_id || user.user_metadata?.schoolId || null,
             }
+            ;(request as any).user = resolvedAuthUser
             authenticatedSchoolId = (request as any).user.schoolId
           }
         } catch {
@@ -44,6 +51,10 @@ export const tenantMiddleware = async (request: FastifyRequest, reply: FastifyRe
     }
   } catch {
     authenticatedSchoolId = null
+  }
+
+  if (resolvedAuthUser) {
+    ;(request as any).jwtVerify = async () => resolvedAuthUser as any
   }
 
   if (authenticatedSchoolId) {

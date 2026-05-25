@@ -10,7 +10,7 @@ import AuthInput from '../components/auth/AuthInput'
 import PasswordField from '../components/ui/PasswordField'
 import PasswordStrength from '../components/auth/PasswordStrength'
 import AuthIllustration from '../components/auth/AuthIllustration'
-import { supabase } from '../lib/supabase'
+import { API_BASE } from '../lib/config'
 
 const registerSchema = z.object({
   schoolName: z.string().min(3, 'School name must be at least 3 characters'),
@@ -47,25 +47,21 @@ const RegisterPage = () => {
     setError(null)
 
     try {
-      const { error: authError } = await supabase.auth.signUp({
-        email: data.email.trim().toLowerCase(),
-        password: data.password,
-        options: {
-          data: {
-            full_name: data.directorFullName,
-            first_name: data.directorFullName.split(' ')[0] || 'User',
-            last_name: data.directorFullName.split(' ').slice(1).join(' '),
-            school: data.schoolName,
-            address: data.address,
-            phone: data.phone,
-            role: 'DIRECTOR',
-            status: 'ACTIVE',
-          },
-        },
+      const response = await fetch(`${API_BASE}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          schoolName: data.schoolName,
+          directorFullName: data.directorFullName,
+          email: data.email.trim().toLowerCase(),
+          phone: data.phone,
+          address: data.address,
+          password: data.password,
+        }),
       })
-
-      if (authError) {
-        throw new Error(authError.message)
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        throw new Error(payload?.error || 'Registration failed')
       }
 
       navigate('/login', {
